@@ -8,3 +8,4 @@ Rust implementation of the greedy and optimal error-bounded PLR algorithms descr
 
 Error-bounded piecewise linear regression is the task of taking a set of datapoints and finding a piecewise linear function that approximates each datapoint within a fixed bound. See the [crate documentation](https://docs.rs/plr/) for more information.
 
+![PLR at various error levels](https://rmarcus.info/images/plr.png)
