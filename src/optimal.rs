@@ -46,7 +46,7 @@ impl Hull {
             let pt2 = self.data.pop_back().unwrap();
             let pt3 = self.data.pop_back().unwrap();
 
-            let line = pt1.line_to(&pt3).unwrap();
+            let line = pt1.line_to(&pt3);
 
             if (self.upper && pt2.above(&line)) || (!self.upper && pt2.below(&line)) {
                 // remove p2
@@ -151,8 +151,8 @@ impl OptimalPLR {
         let s0 = self.s0.as_ref().unwrap();
         let s1 = self.s1.as_ref().unwrap();
 
-        self.rho_lower = s0.upper_bound(gamma).line_to(&s1.lower_bound(gamma));
-        self.rho_upper = s0.lower_bound(gamma).line_to(&s1.upper_bound(gamma));
+        self.rho_lower = Some(s0.upper_bound(gamma).line_to(&s1.lower_bound(gamma)));
+        self.rho_upper = Some(s0.lower_bound(gamma).line_to(&s1.upper_bound(gamma)));
 
         let mut upper_hull = Hull::new_upper();
         let mut lower_hull = Hull::new_lower();
@@ -176,7 +176,7 @@ impl OptimalPLR {
         let avg_slope = Line::average_slope(self.rho_lower.as_ref().unwrap(),
                                             self.rho_upper.as_ref().unwrap());
         
-        let (sint_x, sint_y) = sint.unwrap().to_tuple();
+        let (sint_x, sint_y) = sint.to_tuple();
         let intercept = -avg_slope * sint_x + sint_y;
         return Segment {
             start: segment_start, stop: segment_stop,
@@ -205,7 +205,7 @@ impl OptimalPLR {
             // find the point in the lower hull that would minimize the slope
             // between that point and s_upper
             let it = lower_hull.items().iter().enumerate()
-                .map(|(idx, pt)| (idx, pt.line_to(&s_upper).unwrap()));
+                .map(|(idx, pt)| (idx, pt.line_to(&s_upper)));
 
             // get the min, because we can't use .min() on f64
             let mut curr_best_val = std::f64::INFINITY;
@@ -217,9 +217,9 @@ impl OptimalPLR {
                 }
             }
 
-            self.rho_upper = s_upper.line_to(
+            self.rho_upper = Some(s_upper.line_to(
                 &lower_hull.items()[curr_best_idx]
-            );
+            ));
             
             lower_hull.remove_front(curr_best_idx);
             lower_hull.push(s_lower.clone());
@@ -231,7 +231,7 @@ impl OptimalPLR {
             // find the point in the upper hull that would maximize the slope
             // between that point and s_upper
             let it = upper_hull.items().iter().enumerate()
-                .map(|(idx, pt)| (idx, pt.line_to(&s_lower).unwrap()));
+                .map(|(idx, pt)| (idx, pt.line_to(&s_lower)));
 
             // get the max, because we can't use .max() on f64
             let mut curr_best_val = -std::f64::INFINITY;
@@ -243,9 +243,9 @@ impl OptimalPLR {
                 }
             }
 
-            self.rho_lower = s_lower.line_to(
+            self.rho_lower = Some(s_lower.line_to(
                 &upper_hull.items()[curr_best_idx]
-            );
+            ));
 
             upper_hull.remove_front(curr_best_idx);
             upper_hull.push(s_upper.clone());

@@ -52,18 +52,16 @@ impl Line {
         return (self.a, self.b);
     }
 
-    pub fn intersection(l1: &Line, l2: &Line) -> Option<Point> {
+    pub fn intersection(l1: &Line, l2: &Line) -> Point {
         let (a, c) = l1.as_tuple();
         let (b, d) = l2.as_tuple();
 
-        if relative_eq!(a, b) {
-            return None;
-        }
+        debug_assert!(! relative_eq!(a, b));
         
-        return Some(Point::new(
+        return Point::new(
             (d - c) / (a - b),
             (a*d - b*c) / (a - b)
-        ));
+        );
     }
 
     pub fn average_slope(l1: &Line, l2: &Line) -> f64 {
@@ -93,15 +91,13 @@ impl Point {
         return (self.y - other.y) / (self.x - other.x);
     }
 
-    pub fn line_to(&self, other: &Point) -> Option<Line> {
+    pub fn line_to(&self, other: &Point) -> Line {
         let a = self.slope_to(other);
 
-        if f64::is_nan(a) {
-            return None;
-        }
+        debug_assert!(! f64::is_nan(a));
         
         let b = -a * self.x + self.y;
-        return Some(Line { a, b });
+        return Line { a, b };
     }
 
     pub fn above(&self, line: &Line) -> bool {
@@ -151,8 +147,8 @@ mod test {
         let p1 = Point::new(1.0, 3.0);
         let p2 = Point::new(2.0, 6.0);
 
-        let line1 = p1.line_to(&p2).unwrap();
-        let line2 = p2.line_to(&p1).unwrap();
+        let line1 = p1.line_to(&p2);
+        let line2 = p2.line_to(&p1);
 
         assert_relative_eq!(line1.a, line2.a);
         assert_relative_eq!(line1.b, line2.b);
@@ -161,25 +157,26 @@ mod test {
         assert_relative_eq!(line1.b, 0.0);       
     }
 
+    #[cfg(debug)]
     #[test]
+    #[should_panic]
     fn test_line_ident() {
         let p1 = Point::new(1.0, 3.0);
         let p2 = Point::new(1.0, 6.0);
 
-        assert!(p1.line_to(&p2).is_none());
-        assert!(p2.line_to(&p1).is_none());
+        p1.line_to(&p2);
     }
 
     #[test]
     fn test_intersection() {
         let p1 = Point::new(1.0, 3.0);
         let p2 = Point::new(2.0, 6.0);
-        let line1 = p1.line_to(&p2).unwrap();
+        let line1 = p1.line_to(&p2);
 
         let p3 = Point::new(8.0, -100.0);
-        let line2 = p1.line_to(&p3).unwrap();
+        let line2 = p1.line_to(&p3);
 
-        let intersection = Line::intersection(&line1, &line2).unwrap();
+        let intersection = Line::intersection(&line1, &line2);
 
         assert_relative_eq!(intersection.x, p1.x);
         assert_relative_eq!(intersection.y, p1.y);
@@ -189,7 +186,7 @@ mod test {
     fn test_above_below() {
         let p1 = Point::new(1.0, 3.0);
         let p2 = Point::new(2.0, 6.0);
-        let line1 = p1.line_to(&p2).unwrap();
+        let line1 = p1.line_to(&p2);
 
         let above = Point::new(1.5, 10.0);
         let below = Point::new(1.5, -10.0);

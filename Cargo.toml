@@ -13,6 +13,11 @@ readme = "README.md"
 
 [dependencies]
 approx = "0.3.2"
+criterion = "0.3"
 
 [badges]
 travis-ci = { repository = "RyanMarcus/plr", branch = "master" }
+
+[[bench]]
+name = "optimal_bench"
+harness = false

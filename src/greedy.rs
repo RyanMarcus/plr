@@ -101,10 +101,10 @@ impl GreedyPLR {
         let s0 = self.s0.as_ref().unwrap();
         let s1 = self.s1.as_ref().unwrap();
          
-        self.rho_lower = s0.upper_bound(gamma).line_to(&s1.lower_bound(gamma));
-        self.rho_upper = s0.lower_bound(gamma).line_to(&s1.upper_bound(gamma));
-        self.sint = Line::intersection(self.rho_lower.as_ref().unwrap(),
-                                       self.rho_upper.as_ref().unwrap());
+        self.rho_lower = Some(s0.upper_bound(gamma).line_to(&s1.lower_bound(gamma)));
+        self.rho_upper = Some(s0.lower_bound(gamma).line_to(&s1.upper_bound(gamma)));
+        self.sint = Some(Line::intersection(self.rho_lower.as_ref().unwrap(),
+                                            self.rho_upper.as_ref().unwrap()));
 
         assert!(self.sint.is_some());
     }
@@ -143,11 +143,11 @@ impl GreedyPLR {
         let s_upper = pt.upper_bound(self.gamma);
         let s_lower = pt.lower_bound(self.gamma);
         if s_upper.below(self.rho_upper.as_ref().unwrap()) {
-            self.rho_upper = self.sint.as_ref().unwrap().line_to(&s_upper);
+            self.rho_upper = Some(self.sint.as_ref().unwrap().line_to(&s_upper));
         }
 
         if s_lower.above(self.rho_lower.as_ref().unwrap()) {
-            self.rho_lower = self.sint.as_ref().unwrap().line_to(&s_lower);
+            self.rho_lower = Some(self.sint.as_ref().unwrap().line_to(&s_lower));
         }
 
         return None
