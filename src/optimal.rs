@@ -58,6 +58,7 @@ impl Hull {
                 keep_points.push_front(pt1);
                 self.data.push_back(pt3);
                 self.data.push_back(pt2);
+                break;
             }
         }
 
