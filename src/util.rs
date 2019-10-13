@@ -85,9 +85,7 @@ impl Point {
     }
 
     pub fn slope_to(&self, other: &Point) -> f64 {
-        if relative_eq!(self.x, other.x) {
-            return std::f64::NAN;
-        }
+        debug_assert!(! relative_eq!(self.x, other.x));
         return (self.y - other.y) / (self.x - other.x);
     }
 
@@ -131,15 +129,6 @@ mod test {
 
         assert_relative_eq!(p1.slope_to(&p2), p2.slope_to(&p1));
         assert_relative_eq!(p1.slope_to(&p2), 0.75);
-    }
-
-    #[test]
-    fn test_vert() {
-        let p1 = Point::new(1.0, 3.0);
-        let p2 = Point::new(1.0, 6.0);
-
-        assert!(f64::is_nan(p1.slope_to(&p2)));
-        assert!(f64::is_nan(p2.slope_to(&p1)));
     }
 
     #[test]

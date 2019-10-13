@@ -4,7 +4,7 @@ description = "Performs greedy or optimal error-bounded piecewise linear regress
 repository = "https://github.com/RyanMarcus/plr"
 keywords = ["plr", "piecewise", "regression"]
 license = "GPL-3.0-or-later"
-version = "0.1.4"
+version = "0.1.5"
 authors = ["Ryan Marcus <ryan@ryanmarc.us>"]
 edition = "2018"
 readme = "README.md"
@@ -13,11 +13,13 @@ readme = "README.md"
 
 [dependencies]
 approx = "0.3.2"
+
+[dev-dependencies]
 criterion = "0.3"
 
 [badges]
 travis-ci = { repository = "RyanMarcus/plr", branch = "master" }
 
 [[bench]]
-name = "optimal_bench"
+name = "plr_bench"
 harness = false
