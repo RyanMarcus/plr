@@ -31,6 +31,9 @@ pub struct Line {
     b: f64
 }
 
+/// A single segment of a PLR. The `start` field is inclusive, the `stop` field is exclusive.
+/// The `slope` and `intercept` field can be used in a linear model: in other words, for some
+/// `x` such that `start <= x < stop`, the prediction is `slope * x + intercept`.
 #[derive(Debug)]
 pub struct Segment {
     pub start: f64,
