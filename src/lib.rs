@@ -21,7 +21,7 @@
 
 //! This crate provides code for performing error-bounded piecewise linear regression (PLR) in an
 //! online fashion using either a [greedy](struct.GreedyPLR.html) (constant time per point, constant
-//! space) or [optimal](struct.OptimalPLR.html) (constant time per point, linear space) algorithm. Both
+//! space) or [optimal](struct.OptimalPLR.html) (linear time per point, linear space) algorithm. Both
 //! algorithms were implemented as described in:
 //!
 //! > Qing Xie, Chaoyi Pang, Xiaofang Zhou, Xiangliang Zhang, and Ke Deng. 2014. Maximum error-bounded Piecewise Linear Representation for online stream approximation. The VLDB Journal 23, 6 (December 2014), 915–937. DOI: https://doi.org/10.1007/s00778-014-0355-0
@@ -743,7 +743,7 @@
 //!   constant amount of space. Greedy PLR always finds a PLR with the specified error
 //!   bound (e.g., none of the original points will be more than δ from their predictions),
 //!   but the greedy approach may not find the PLR with the minimal number of segments.
-//! * [Optimal PLR](struct.OptimalPLR.html), which uses a constant time per point and
+//! * [Optimal PLR](struct.OptimalPLR.html), which uses a linear time per point and
 //!   potentially linear space. In practice, the amount of space used by the optimal algorithm
 //!   should be small, but in the worst case linear space may be required (see
 //!   [the paper](https://dl.acm.org/citation.cfm?id=2691542) for more details). The optimal

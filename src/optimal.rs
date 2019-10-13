@@ -71,7 +71,7 @@ enum OptimalState {
     Need2, Need1, Ready
 }
 
-/// Performs an optimal piecewise linear regression (PLR) in an online fashion. This approach uses constant
+/// Performs an optimal piecewise linear regression (PLR) in an online fashion. This approach uses linear
 /// time for each call to [`process`](#method.process) and potentially linear space. In practice,
 /// the space used is generally a small fraction of the data. If constant space is required for your
 /// applications, please see [`GreedyPLR`](struct.GreedyPLR.html).
