@@ -41,8 +41,6 @@ impl Hull {
     fn push(&mut self, pt: Point) {
         self.data.push_back(pt);
 
-        let mut keep_points = VecDeque::new();
-
         while self.data.len() > 2 {
             let pt1 = self.data.pop_back().unwrap();
             let pt2 = self.data.pop_back().unwrap();
@@ -55,18 +53,12 @@ impl Hull {
                 self.data.push_back(pt3);
                 self.data.push_back(pt1);
             } else {
-                keep_points.push_front(pt1);
                 self.data.push_back(pt3);
                 self.data.push_back(pt2);
+                self.data.push_back(pt1);
                 break;
             }
         }
-
-        while !self.data.is_empty() {
-            keep_points.push_front(self.data.pop_back().unwrap());
-        }
-
-        self.data = keep_points;
     }
 
     fn items(&self) -> &VecDeque<Point> {
