@@ -12,3 +12,6 @@ edition = "2018"
 
 [dependencies]
 approx = "0.3.2"
+
+[badges]
+travis-ci = { repository = "RyanMarcus/plr", branch = "master" }
