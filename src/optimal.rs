@@ -35,27 +35,27 @@ impl Hull {
     }
 
     fn remove_front(&mut self, count: usize) {
-        for _ in 0..count { self.data.pop_front().unwrap(); }
+        for _ in 0..count {
+            let res = self.data.pop_front();
+            debug_assert!(res.is_some());
+        }
     }
 
     fn push(&mut self, pt: Point) {
         self.data.push_back(pt);
 
         while self.data.len() > 2 {
-            let pt1 = self.data.pop_back().unwrap();
-            let pt2 = self.data.pop_back().unwrap();
-            let pt3 = self.data.pop_back().unwrap();
+            let pt1 = &self.data[self.data.len() - 1];
+            let pt2 = &self.data[self.data.len() - 2];
+            let pt3 = &self.data[self.data.len() - 3];
 
             let line = pt1.line_to(&pt3);
 
             if (self.upper && pt2.above(&line)) || (!self.upper && pt2.below(&line)) {
                 // remove p2
-                self.data.push_back(pt3);
-                self.data.push_back(pt1);
+                let res = self.data.remove(self.data.len() - 2);
+                debug_assert!(res.is_some());
             } else {
-                self.data.push_back(pt3);
-                self.data.push_back(pt2);
-                self.data.push_back(pt1);
                 break;
             }
         }
