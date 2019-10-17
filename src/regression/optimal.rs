@@ -77,13 +77,13 @@ enum OptimalState {
 /// applications, please see [`GreedyPLR`](struct.GreedyPLR.html).
 ///
 /// Each call to [`process`](#method.process) consumes a single point. Each time it is called,
-/// [`process`](#method.process) returns either a [`Segment`](struct.Segment.html) representing
+/// [`process`](#method.process) returns either a [`Segment`](../struct.Segment.html) representing
 /// a piece of the final regression, or `None`. If your stream of points terminates, you can call
 /// [`finish`](#method.finish) to flush the buffer and return the final segment.
 ///
 /// # Example
 /// ```
-/// use plr::OptimalPLR;
+/// use plr::regression::OptimalPLR;
 /// // first, generate some data points...
 /// let mut data = Vec::new();
 ///  
@@ -132,7 +132,7 @@ impl OptimalPLR {
     ///
     /// To perform an optimal PLR with a maximum error of `0.05`:
     /// ```
-    /// use plr::OptimalPLR;
+    /// use plr::regression::OptimalPLR;
     /// let plr = OptimalPLR::new(0.05);
     /// ```
     pub fn new(gamma: f64) -> OptimalPLR {
@@ -255,7 +255,7 @@ impl OptimalPLR {
     }
 
     /// Processes a single point using the optimal PLR algorithm. This function returns
-    /// a new [`Segment`](struct.Segment.html) when the current segment cannot accommodate
+    /// a new [`Segment`](../struct.Segment.html) when the current segment cannot accommodate
     /// the passed point, and returns None if the current segment could be (greedily) adjusted to
     /// fit the point.
     pub fn process(&mut self, x: f64, y: f64) -> Option<Segment> {

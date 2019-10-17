@@ -16,10 +16,18 @@ approx = "0.3.2"
 
 [dev-dependencies]
 criterion = "0.3"
+superslice = "1.0.0"
+
+#[profile.release]
+#debug = true
 
 [badges]
 travis-ci = { repository = "RyanMarcus/plr", branch = "master" }
 
 [[bench]]
 name = "plr_bench"
+harness = false
+
+[[bench]]
+name = "spline_bench"
 harness = false

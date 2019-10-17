@@ -19,6 +19,7 @@
 // < end copyright > 
 use std::collections::VecDeque;
 use crate::util::*;
+use superslice::*;
 
 pub fn sin_data() -> Vec<(f64, f64)> {
     let mut data = Vec::new();
@@ -69,5 +70,25 @@ pub fn verify_gamma(gamma: f64, data: &[(f64, f64)], segments: &[Segment]) {
                 "Prediction of {} was not within gamma ({}) of true value {}",
                 pred, gamma, y);
     }
+}
 
+fn spline_interpolate(pt: f64, knots: &[(f64, f64)]) -> (f64, f64) {
+    let upper_idx = usize::min(knots.len() - 1,
+                               knots.upper_bound_by(|x| x.0.partial_cmp(&pt).unwrap()));
+    let lower_idx = upper_idx - 1;
+
+    println!("{:?} <= {} < {:?}", knots[lower_idx], pt, knots[upper_idx]);
+    return Point::from_tuple(knots[lower_idx])
+        .line_to(&Point::from_tuple(knots[upper_idx]))
+        .at(pt).to_tuple();
+}
+
+pub fn verify_gamma_splines(gamma: f64, data: &[(f64, f64)], pts: &[(f64, f64)]) {
+    println!("{:?}", pts);
+    for &(x, y) in data {
+        let pred = spline_interpolate(x, pts);
+        assert!(f64::abs(pred.1 - y) <= gamma,
+                "Prediction of {} was not within gamma ({}) of true value {}",
+                pred.1, gamma, y);
+    }
 }

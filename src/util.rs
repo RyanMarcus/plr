@@ -79,6 +79,10 @@ impl Point {
     pub fn new(x: f64, y: f64) -> Point {
         return Point { x, y };
     }
+
+    pub fn from_tuple(pt: (f64, f64)) -> Point {
+        return Point::new(pt.0, pt.1);
+    }
     
     pub fn to_tuple(&self) -> (f64, f64) {
         return (self.x, self.y);

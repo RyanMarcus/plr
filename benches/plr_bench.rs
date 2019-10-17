@@ -1,5 +1,5 @@
 use criterion::{criterion_group, criterion_main, Criterion};
-use plr::{OptimalPLR, GreedyPLR};
+use plr::regression::{OptimalPLR, GreedyPLR};
 
 pub fn criterion_benchmark(c: &mut Criterion) {
     let mut data = Vec::new();
