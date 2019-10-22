@@ -79,4 +79,12 @@ mod test {
         assert_eq!(pts.len(), 2);
         verify_gamma_splines(0.0005, &data, &pts);
     }
+
+    #[test]
+    fn test_precision() {
+        let data = precision_data();
+        let pts = greedy(&data, 0.0005);
+        assert_eq!(pts.len(), 2);
+        verify_gamma_splines(0.0005, &data, &pts);
+    }
 }

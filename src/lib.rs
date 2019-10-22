@@ -755,8 +755,11 @@ mod util;
 pub mod regression;
 pub mod spline;
 
+
 #[cfg(test)]
 mod test_util;
+#[cfg(test)]
+mod data;
 
 //pub use regression::GreedyPLR;
 //pub use regression::OptimalPLR;

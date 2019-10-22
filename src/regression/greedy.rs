@@ -103,6 +103,8 @@ impl GreedyPLR {
          
         self.rho_lower = Some(s0.upper_bound(gamma).line_to(&s1.lower_bound(gamma)));
         self.rho_upper = Some(s0.lower_bound(gamma).line_to(&s1.upper_bound(gamma)));
+
+        
         self.sint = Some(Line::intersection(self.rho_lower.as_ref().unwrap(),
                                             self.rho_upper.as_ref().unwrap()));
 
@@ -187,9 +189,11 @@ impl GreedyPLR {
             GreedyState::Need2 => None,
             GreedyState::Need1 => {
                 let s0 = self.s0.unwrap().to_tuple();
-                Some(Segment { start: s0.0, stop: s0.0 + 1.0, slope: 0.0, intercept: s0.1 })
+                Some(Segment { start: s0.0, stop: std::f64::MAX, slope: 0.0, intercept: s0.1 })
             },
-            GreedyState::Ready => Some(self.current_segment(self.s_last.as_ref().unwrap().to_tuple().0 + 1.0))
+            GreedyState::Ready => {
+                Some(self.current_segment(std::f64::MAX))
+            }
         };
     }
 }
@@ -239,6 +243,67 @@ mod test {
         }
 
         assert_eq!(segments.len(), 1);
-        verify_gamma(0.0005, &data, &segments);
+        verify_gamma(0.00005, &data, &segments);
+    }
+
+    #[test]
+    fn test_precision() {
+        let mut plr = GreedyPLR::new(0.00005);
+        let data = precision_data();
+
+        let mut segments = Vec::new();
+        
+        for &(x, y) in data.iter() {
+            if let Some(segment) = plr.process(x, y) {
+                segments.push(segment);
+            }
+        }
+
+        if let Some(segment) = plr.finish() {
+            segments.push(segment);
+        }
+
+        assert_eq!(segments.len(), 1);
+        verify_gamma(0.00005, &data, &segments);
+    }
+
+    #[test]
+    fn test_osm() {
+        let mut plr = GreedyPLR::new(64.0);
+        let data = osm_data();
+
+        let mut segments = Vec::new();
+        
+        for &(x, y) in data.iter() {
+            if let Some(segment) = plr.process(x, y) {
+                segments.push(segment);
+            }
+        }
+
+        if let Some(segment) = plr.finish() {
+            segments.push(segment);
+        }
+
+        verify_gamma(64.0, &data, &segments);
+    }
+
+    #[test]
+    fn test_fb() {
+        let mut plr = GreedyPLR::new(64.0);
+        let data = fb_data();
+
+        let mut segments = Vec::new();
+        
+        for &(x, y) in data.iter() {
+            if let Some(segment) = plr.process(x, y) {
+                segments.push(segment);
+            }
+        }
+
+        if let Some(segment) = plr.finish() {
+            segments.push(segment);
+        }
+
+        verify_gamma(64.0, &data, &segments);
     }
 }

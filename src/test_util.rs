@@ -20,6 +20,8 @@
 use std::collections::VecDeque;
 use crate::util::*;
 use superslice::*;
+use crate::data::*;
+use approx::*;
 
 pub fn sin_data() -> Vec<(f64, f64)> {
     let mut data = Vec::new();
@@ -45,13 +47,39 @@ pub fn linear_data(slope: f64, intercept: f64) -> Vec<(f64, f64)> {
     return data;
 }
 
+pub fn precision_data() -> Vec<(f64, f64)> {
+    let mut data = Vec::new();
+
+    for i in 0..1000 {
+        let x = ((i as f64) / 1000.0) * f64::powi(2.0, 60);
+        
+        let y = i as f64;
+
+        data.push((x, y));
+    }
+
+    return data;
+}
+
+pub fn osm_data() -> Vec<(f64, f64)> {
+    return OSM_DATA.iter()
+        .map(|&(x, y)| (x as f64, y as f64))
+        .collect();
+}
+
+pub fn fb_data() -> Vec<(f64, f64)> {
+    return FB_DATA.iter()
+        .map(|&(x, y)| (x as f64, y as f64))
+        .collect();
+}
+
 pub fn verify_gamma(gamma: f64, data: &[(f64, f64)], segments: &[Segment]) {
     let mut seg_q = VecDeque::new();
 
     for segment in segments {
         seg_q.push_back(segment);
     }
-
+    
     for &(x, y) in data {
         while seg_q.front().unwrap().stop <= x {
             seg_q.pop_front();
@@ -65,7 +93,12 @@ pub fn verify_gamma(gamma: f64, data: &[(f64, f64)], segments: &[Segment]) {
         let line = Line::new(seg.slope, seg.intercept);
         let pred = line.at(x).y;
 
-        println!("{} {} with {:?}", x, y, seg);
+        if x as u64 == 42285439947654605 {
+            println!("{} to {}", x, pred);
+            println!("with slope: {} and intercept: {}", seg.slope, seg.intercept);
+            println!("segment start: {}", seg.start);
+        }
+
         assert!(f64::abs(pred - y) <= gamma,
                 "Prediction of {} was not within gamma ({}) of true value {}",
                 pred, gamma, y);
@@ -92,3 +125,6 @@ pub fn verify_gamma_splines(gamma: f64, data: &[(f64, f64)], pts: &[(f64, f64)])
                 pred.1, gamma, y);
     }
 }
+
+
+

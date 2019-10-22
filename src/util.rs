@@ -19,6 +19,7 @@
 // < end copyright > 
 
 use approx::*;
+use rug::Float;
 
 #[derive(Debug, Clone)]
 pub struct Point {
@@ -56,16 +57,40 @@ impl Line {
         let (a, c) = l1.as_tuple();
         let (b, d) = l2.as_tuple();
 
-        debug_assert!(! relative_eq!(a, b));
+        // handle floating point precision issues when both slopes are very
+        // small numbers
+        if relative_eq!(a, b) {
+            let a_f = Float::with_val(128, a);
+            let b_f = Float::with_val(128, b);
+            let c_f = Float::with_val(128, c);
+            let d_f = Float::with_val(128, d);
+            
+            let denom_f: Float = Float::with_val(128, &a_f - &b_f);
+
+            let x_val = Float::with_val(128, (d_f.clone() - c_f.clone()) / denom_f.clone()).to_f64();
+            let y_val = ((a_f * d_f - b_f * c_f) / denom_f).to_f64();
+
+            return Point::new(x_val, y_val);
+        }
+
+        let denom = a - b;
+        let x_val = (d - c) / denom;
+        let y_val = (a*d - b*c) / denom;
         
-        return Point::new(
-            (d - c) / (a - b),
-            (a*d - b*c) / (a - b)
-        );
+        return Point::new(x_val, y_val);
     }
 
     pub fn average_slope(l1: &Line, l2: &Line) -> f64 {
-        return (l1.a + l2.a) / 2.0;
+        if relative_eq!(l1.a, l2.a) {
+            // use higher precision
+            let a1 = Float::with_val(128, l1.a);
+            let a2 = Float::with_val(128, l2.a);
+            let avg = ((a1 + a2) / Float::with_val(128, 2.0)).to_f64();
+            return avg;
+        }
+
+        // min + max to avoid precision loss
+        return (f64::min(l1.a, l2.a) + f64::max(l1.a, l2.a)) / 2.0;
     }
 
     pub fn slope(&self) -> f64 { return self.a; }
@@ -88,8 +113,19 @@ impl Point {
         return (self.x, self.y);
     }
 
-    pub fn slope_to(&self, other: &Point) -> f64 {
-        debug_assert!(! relative_eq!(self.x, other.x));
+    pub fn slope_to(&self, other: &Point) -> f64 {        
+        // handle floating point precision issues when both x coords are very
+        // large (or very small, although this is uncommon) numbers
+        if relative_eq!(self.x, other.x) {
+            let x1_f = Float::with_val(128, self.x);
+            let y1_f = Float::with_val(128, self.y);
+            let x2_f = Float::with_val(128, other.x);
+            let y2_f = Float::with_val(128, other.y);
+            
+            let res = ((y1_f - y2_f) / (x1_f - x2_f)).to_f64();
+            return res;
+        }
+        
         return (self.y - other.y) / (self.x - other.x);
     }
 
@@ -111,10 +147,18 @@ impl Point {
     }
 
     pub fn upper_bound(&self, gamma: f64) -> Point {
+        // check float precision
+        debug_assert!(! relative_eq!(self.y, self.y + gamma),
+                      "Gamma value of {} and encountered Y value of {} won't work in 64-bit!",
+                      gamma, self.y);
         return Point { x: self.x, y: self.y + gamma };
     }
 
     pub fn lower_bound(&self, gamma: f64) -> Point {
+        // check float precision
+        debug_assert!(! relative_eq!(self.y, self.y - gamma),
+                      "Gamma value of {} and encountered Y value of {} won't work in 64-bit!",
+                      gamma, self.y);
         return Point { x: self.x, y: self.y - gamma };
     }
 
