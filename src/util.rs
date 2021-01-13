@@ -20,6 +20,7 @@
 
 use approx::*;
 use rug::Float;
+use serde::Serialize;
 
 #[derive(Debug, Clone)]
 pub struct Point {
@@ -35,7 +36,7 @@ pub struct Line {
 /// A single segment of a PLR. The `start` field is inclusive, the `stop` field is exclusive.
 /// The `slope` and `intercept` field can be used in a linear model: in other words, for some
 /// `x` such that `start <= x < stop`, the prediction is `slope * x + intercept`.
-#[derive(Debug)]
+#[derive(Debug, Serialize)]
 pub struct Segment {
     pub start: f64,
     pub stop: f64,
