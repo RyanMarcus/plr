@@ -1,6 +1,6 @@
 # PLR (piecewise linear regression)
 
-[![Travis CI](https://travis-ci.org/RyanMarcus/plr.svg?branch=master)](https://travis-ci.org/RyanMarcus/plr) [![crates.io](https://img.shields.io/crates/v/plr.svg)](https://crates.io/crates/plr)
+[![Rust](https://github.com/RyanMarcus/plr/actions/workflows/rust.yml/badge.svg)](https://github.com/RyanMarcus/plr/actions/workflows/rust.yml) [![crates.io](https://img.shields.io/crates/v/plr.svg)](https://crates.io/crates/plr)
 
 Rust implementation of the greedy and optimal error-bounded PLR algorithms described in:
 
