@@ -761,7 +761,8 @@
 //!   segments.
 //!
 //! This package can also perform spline regression instead of piecewise
-//! linear regression. See [greedy_splines](spline/fn.greedy_spline.html).
+//! linear regression. See [greedy_splines](spline/fn.greedy_spline.html),
+//! or the online version [GreedySpline](spline/struct.GreedySpline.html).
 //!
 //!
 //! Written by [Ryan Marcus](https://rmarcus.info), licensed under the GPL

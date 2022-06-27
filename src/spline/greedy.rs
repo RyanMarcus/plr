@@ -19,6 +19,8 @@ pub struct GreedySpline {
 }
 
 impl GreedySpline {
+    /// Constructs a new online greedy spline regression. The first point,
+    /// passed to this function, must be used as the first spline point.
     pub fn new(pt1: Point, err: f64) -> GreedySpline {
         GreedySpline {
             error: err,
@@ -29,6 +31,7 @@ impl GreedySpline {
         }
     }
 
+    /// Add another point the spline regression, potentially returning a new knot.
     pub fn process(&mut self, pt: &Point) -> Option<Point> {
         match self.pt2 {
             None => {
@@ -59,6 +62,7 @@ impl GreedySpline {
         };
     }
 
+    /// Finish the spline regression, returning the final knot.
     pub fn finish(self) -> Point {
         match self.pt2 {
             Some(pt) => pt,
