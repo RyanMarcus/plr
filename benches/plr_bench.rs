@@ -1,5 +1,5 @@
 use criterion::{criterion_group, criterion_main, Criterion};
-use plr::regression::{OptimalPLR, GreedyPLR};
+use plr::regression::{GreedyPLR, OptimalPLR};
 
 pub fn criterion_benchmark(c: &mut Criterion) {
     let mut data = Vec::new();
@@ -10,26 +10,30 @@ pub fn criterion_benchmark(c: &mut Criterion) {
 
         data.push((x, y));
     }
-    
-    c.bench_function("optimal 2000", |b| b.iter(|| {
-        let mut plr = OptimalPLR::new(0.0005);
 
-        for &(x, y) in data.iter() {
-            plr.process(x, y);
-        }
+    c.bench_function("optimal 2000", |b| {
+        b.iter(|| {
+            let mut plr = OptimalPLR::new(0.0005);
 
-        plr.finish();
-    }));
+            for &(x, y) in data.iter() {
+                plr.process(x, y);
+            }
 
-    c.bench_function("greedy 2000", |b| b.iter(|| {
-        let mut plr = GreedyPLR::new(0.0005);
+            plr.finish();
+        })
+    });
 
-        for &(x, y) in data.iter() {
-            plr.process(x, y);
-        }
+    c.bench_function("greedy 2000", |b| {
+        b.iter(|| {
+            let mut plr = GreedyPLR::new(0.0005);
 
-        plr.finish();
-    }));
+            for &(x, y) in data.iter() {
+                plr.process(x, y);
+            }
+
+            plr.finish();
+        })
+    });
 }
 
 criterion_group!(benches, criterion_benchmark);

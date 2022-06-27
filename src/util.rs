@@ -1,35 +1,36 @@
-// < begin copyright > 
+// < begin copyright >
 // Copyright Ryan Marcus 2019
-// 
+//
 // This file is part of plr.
-// 
+//
 // plr is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // plr is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with plr.  If not, see <http://www.gnu.org/licenses/>.
-// 
-// < end copyright > 
+//
+// < end copyright >
 
 use approx::*;
 use rug::Float;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct Point {
-    pub x: f64, pub y: f64
+    pub x: f64,
+    pub y: f64,
 }
 
 #[derive(Debug)]
 pub struct Line {
     a: f64,
-    b: f64
+    b: f64,
 }
 
 /// A single segment of a PLR. The `start` field is inclusive, the `stop` field is exclusive.
@@ -40,13 +41,16 @@ pub struct Segment {
     pub start: f64,
     pub stop: f64,
     pub slope: f64,
-    pub intercept: f64
+    pub intercept: f64,
 }
 
 impl Line {
     #[cfg(test)]
     pub fn new(slope: f64, intercept: f64) -> Line {
-        return Line { a: slope, b: intercept };
+        return Line {
+            a: slope,
+            b: intercept,
+        };
     }
 
     fn as_tuple(&self) -> (f64, f64) {
@@ -64,10 +68,11 @@ impl Line {
             let b_f = Float::with_val(128, b);
             let c_f = Float::with_val(128, c);
             let d_f = Float::with_val(128, d);
-            
+
             let denom_f: Float = Float::with_val(128, &a_f - &b_f);
 
-            let x_val = Float::with_val(128, (d_f.clone() - c_f.clone()) / denom_f.clone()).to_f64();
+            let x_val =
+                Float::with_val(128, (d_f.clone() - c_f.clone()) / denom_f.clone()).to_f64();
             let y_val = ((a_f * d_f - b_f * c_f) / denom_f).to_f64();
 
             return Point::new(x_val, y_val);
@@ -75,8 +80,8 @@ impl Line {
 
         let denom = a - b;
         let x_val = (d - c) / denom;
-        let y_val = (a*d - b*c) / denom;
-        
+        let y_val = (a * d - b * c) / denom;
+
         return Point::new(x_val, y_val);
     }
 
@@ -93,7 +98,9 @@ impl Line {
         return (f64::min(l1.a, l2.a) + f64::max(l1.a, l2.a)) / 2.0;
     }
 
-    pub fn slope(&self) -> f64 { return self.a; }
+    pub fn slope(&self) -> f64 {
+        return self.a;
+    }
 
     pub fn at(&self, x: f64) -> Point {
         return Point::new(x, self.a * x + self.b);
@@ -108,12 +115,12 @@ impl Point {
     pub fn from_tuple(pt: (f64, f64)) -> Point {
         return Point::new(pt.0, pt.1);
     }
-    
-    pub fn to_tuple(&self) -> (f64, f64) {
+
+    pub fn as_tuple(&self) -> (f64, f64) {
         return (self.x, self.y);
     }
 
-    pub fn slope_to(&self, other: &Point) -> f64 {        
+    pub fn slope_to(&self, other: &Point) -> f64 {
         // handle floating point precision issues when both x coords are very
         // large (or very small, although this is uncommon) numbers
         if relative_eq!(self.x, other.x) {
@@ -121,19 +128,19 @@ impl Point {
             let y1_f = Float::with_val(128, self.y);
             let x2_f = Float::with_val(128, other.x);
             let y2_f = Float::with_val(128, other.y);
-            
+
             let res = ((y1_f - y2_f) / (x1_f - x2_f)).to_f64();
             return res;
         }
-        
+
         return (self.y - other.y) / (self.x - other.x);
     }
 
     pub fn line_to(&self, other: &Point) -> Line {
         let a = self.slope_to(other);
 
-        debug_assert!(! f64::is_nan(a));
-        
+        debug_assert!(!f64::is_nan(a));
+
         let b = -a * self.x + self.y;
         return Line { a, b };
     }
@@ -148,28 +155,38 @@ impl Point {
 
     pub fn upper_bound(&self, gamma: f64) -> Point {
         // check float precision
-        debug_assert!(! relative_eq!(self.y, self.y + gamma),
-                      "Gamma value of {} and encountered Y value of {} won't work in 64-bit!",
-                      gamma, self.y);
-        return Point { x: self.x, y: self.y + gamma };
+        debug_assert!(
+            !relative_eq!(self.y, self.y + gamma),
+            "Gamma value of {} and encountered Y value of {} won't work in 64-bit!",
+            gamma,
+            self.y
+        );
+        return Point {
+            x: self.x,
+            y: self.y + gamma,
+        };
     }
 
     pub fn lower_bound(&self, gamma: f64) -> Point {
         // check float precision
-        debug_assert!(! relative_eq!(self.y, self.y - gamma),
-                      "Gamma value of {} and encountered Y value of {} won't work in 64-bit!",
-                      gamma, self.y);
-        return Point { x: self.x, y: self.y - gamma };
+        debug_assert!(
+            !relative_eq!(self.y, self.y - gamma),
+            "Gamma value of {} and encountered Y value of {} won't work in 64-bit!",
+            gamma,
+            self.y
+        );
+        return Point {
+            x: self.x,
+            y: self.y - gamma,
+        };
     }
-
 }
-
 
 #[cfg(test)]
 mod test {
-    use approx::*;
     use super::*;
-    
+    use approx::*;
+
     #[test]
     fn test_slope() {
         let p1 = Point::new(1.0, 3.0);
@@ -191,7 +208,7 @@ mod test {
         assert_relative_eq!(line1.b, line2.b);
 
         assert_relative_eq!(line1.a, 3.0);
-        assert_relative_eq!(line1.b, 0.0);       
+        assert_relative_eq!(line1.b, 0.0);
     }
 
     #[cfg(debug)]
@@ -231,5 +248,4 @@ mod test {
         assert!(above.above(&line1));
         assert!(below.below(&line1));
     }
-
 }

@@ -1,38 +1,44 @@
-// < begin copyright > 
+// < begin copyright >
 // Copyright Ryan Marcus 2019
-// 
+//
 // This file is part of plr.
-// 
+//
 // plr is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
-// 
+//
 // plr is distributed in the hope that it will be useful,
 // but WITHOUT ANY WARRANTY; without even the implied warranty of
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 // GNU General Public License for more details.
-// 
+//
 // You should have received a copy of the GNU General Public License
 // along with plr.  If not, see <http://www.gnu.org/licenses/>.
-// 
-// < end copyright > 
+//
+// < end copyright >
 #![allow(clippy::needless_return)]
 
-//! This crate provides code for performing error-bounded piecewise linear regression (PLR) in an
-//! online fashion using either a [greedy](regression/struct.GreedyPLR.html) (constant time per point, constant
-//! space) or [optimal](regression/struct.OptimalPLR.html) (linear time per point, linear space) algorithm. Both
-//! algorithms were implemented as described in:
+//! This crate provides code for performing error-bounded piecewise linear
+//! regression (PLR) in an online fashion using either a
+//! [greedy](regression/struct.GreedyPLR.html) (constant time per point,
+//! constant space) or [optimal](regression/struct.OptimalPLR.html) (linear
+//! time per point, linear space) algorithm. Both algorithms were
+//! implemented as described in:
 //!
-//! > Qing Xie, Chaoyi Pang, Xiaofang Zhou, Xiangliang Zhang, and Ke Deng. 2014. Maximum error-bounded Piecewise Linear Representation for online stream approximation. The VLDB Journal 23, 6 (December 2014), 915–937. DOI: https://doi.org/10.1007/s00778-014-0355-0
+//! > Qing Xie, Chaoyi Pang, Xiaofang Zhou, Xiangliang Zhang, and Ke Deng.
+//! > 2014. Maximum error-bounded Piecewise Linear Representation for
+//! > online stream approximation. The VLDB Journal 23, 6 (December 2014),
+//! > 915–937. DOI: <https://doi.org/10.1007/s00778-014-0355-0>
 //!
-//! Error-bounded piecewise linear regression is the task of taking a set of datapoints and finding a
-//! piecewise linear function that approximates each datapoint within a fixed bound. In other words,
-//! given a dataset `(x, y) ∈ D`, we seek a piecewise linear function `f` such that
-//! `∀(x, y)∈D(|f(x) - y| < δ)`, for some given δ. This can also be thought of as minimizing the
-//! "L-infinity" loss.
-//! Since `f` could be trivially realized by a piecewise linear function with `|D|` pieces, we also seek
-//! the `f` with a minimal number of pieces.
+//! Error-bounded piecewise linear regression is the task of taking a set
+//! of datapoints and finding a piecewise linear function that approximates
+//! each datapoint within a fixed bound. In other words, given a dataset
+//! `(x, y) ∈ D`, we seek a piecewise linear function `f` such that `∀(x,
+//! y)∈D(|f(x) - y| < δ)`, for some given δ. This can also be thought of as
+//! minimizing the "L-infinity" loss. Since `f` could be trivially realized
+//! by a piecewise linear function with `|D|` pieces, we also seek the `f`
+//! with a minimal number of pieces.
 //!
 //! <div>
 //! <img src="data:image/png;base64,
@@ -733,36 +739,45 @@
 //! ">
 //! </div>
 //!
-//! In the example above, we show the original 1000 data points (left), a PLR with
-//! a maximum error of 0.05 (center), and a PLR with a maximum error of 0.005. All
-//! of the displayed PLRs are optimal, meaning that they contain the fewest number
-//! segments possible to achieve their error bound.
+//! In the example above, we show the original 1000 data points (left), a
+//! PLR with a maximum error of 0.05 (center), and a PLR with a maximum
+//! error of 0.005. All of the displayed PLRs are optimal, meaning that
+//! they contain the fewest number segments possible to achieve their error
+//! bound.
 //!
 //! This package can perform PLR using one of two online algorithms:
-//! * [Greedy PLR](regression/struct.GreedyPLR.html), which uses a constant time per point and a
-//!   constant amount of space. Greedy PLR always finds a PLR with the specified error
-//!   bound (e.g., none of the original points will be more than δ from their predictions),
-//!   but the greedy approach may not find the PLR with the minimal number of segments.
-//! * [Optimal PLR](regression/struct.OptimalPLR.html), which uses a linear time per point and
-//!   potentially linear space. In practice, the amount of space used by the optimal algorithm
-//!   should be small, but in the worst case linear space may be required (see
-//!   [the paper](https://dl.acm.org/citation.cfm?id=2691542) for more details). The optimal
-//!   algorithm will find the solution with a minimal number of segments.
+//! * [Greedy PLR](regression/struct.GreedyPLR.html), which uses a constant
+//!   time per point and a constant amount of space. Greedy PLR always
+//!   finds a PLR with the specified error bound (e.g., none of the
+//!   original points will be more than δ from their predictions), but the
+//!   greedy approach may not find the PLR with the minimal number of
+//!   segments.
+//! * [Optimal PLR](regression/struct.OptimalPLR.html), which uses a linear
+//!   time per point and potentially linear space. In practice, the amount
+//!   of space used by the optimal algorithm should be small, but in the
+//!   worst case linear space may be required (see [the
+//!   paper](https://dl.acm.org/citation.cfm?id=2691542) for more details).
+//!   The optimal algorithm will find the solution with a minimal number of
+//!   segments.
 //!
-//! Written by [Ryan Marcus](https://rmarcus.info), licensed under the GPL v3.
+//! This package can also perform spline regression instead of piecewise
+//! linear regression. See [greedy_splines](spline/fn.greedy_spline.html).
+//!
+//!
+//! Written by [Ryan Marcus](https://rmarcus.info), licensed under the GPL
+//! v3.
 
-mod util;
 pub mod regression;
 pub mod spline;
-
+mod util;
 
 #[cfg(test)]
 mod test_util;
+
 #[cfg(test)]
 mod data;
 
 //pub use regression::GreedyPLR;
 //pub use regression::OptimalPLR;
-
 
 pub use util::Segment;

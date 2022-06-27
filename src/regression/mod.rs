@@ -1,5 +1,5 @@
-mod optimal;
 mod greedy;
+mod optimal;
 
-pub use optimal::OptimalPLR;
 pub use greedy::GreedyPLR;
+pub use optimal::OptimalPLR;

@@ -1,3 +1,3 @@
 mod greedy;
 
-pub use greedy::greedy;
+pub use greedy::greedy_spline;
