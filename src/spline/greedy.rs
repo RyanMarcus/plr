@@ -21,7 +21,8 @@ pub struct GreedySpline {
 impl GreedySpline {
     /// Constructs a new online greedy spline regression. The first point,
     /// passed to this function, must be used as the first spline point.
-    pub fn new(pt1: Point, err: f64) -> GreedySpline {
+    pub fn new(x: f64, y: f64, err: f64) -> GreedySpline {
+        let pt1 = Point::new(x, y);
         GreedySpline {
             error: err,
             pt1,
@@ -32,10 +33,11 @@ impl GreedySpline {
     }
 
     /// Add another point the spline regression, potentially returning a new knot.
-    pub fn process(&mut self, pt: &Point) -> Option<Point> {
+    pub fn process(&mut self, x: f64, y: f64) -> Option<(f64, f64)> {
+        let pt = Point::new(x, y);
         match self.pt2 {
             None => {
-                self.pt2 = Some(*pt);
+                self.pt2 = Some(pt);
                 return None;
             }
 
@@ -49,11 +51,11 @@ impl GreedySpline {
                     self.slope_lb = std::f64::NEG_INFINITY;
                     self.slope_ub = std::f64::INFINITY;
                     self.pt2 = None;
-                    return Some(pt2);
+                    return Some(pt2.as_tuple());
                 }
 
                 // otherwise, we have a new pt2 and need to update the slope bounds
-                self.pt2 = Some(*pt);
+                self.pt2 = Some(pt);
                 self.slope_lb = f64::max(self.slope_lb, potential_lower);
                 self.slope_ub = f64::min(self.slope_ub, potential_upper);
 
@@ -63,10 +65,10 @@ impl GreedySpline {
     }
 
     /// Finish the spline regression, returning the final knot.
-    pub fn finish(self) -> Point {
+    pub fn finish(self) -> (f64, f64) {
         match self.pt2 {
-            Some(pt) => pt,
-            None => self.pt1,
+            Some(pt) => (pt.x, pt.y),
+            None => (self.pt1.x, self.pt1.y)
         }
     }
 }
@@ -80,14 +82,14 @@ pub fn greedy_spline(data: &[(f64, f64)], err: f64) -> Vec<(f64, f64)> {
     }
 
     let mut pts = vec![data[0]];
-    let mut gs = GreedySpline::new(Point::from_tuple(data[0]), err);
+    let mut gs = GreedySpline::new(data[0].0, data[0].1, err);
 
     for pt in &data[1..] {
-        if let Some(knot) = gs.process(&Point::from_tuple(*pt)) {
-            pts.push(knot.as_tuple());
+        if let Some(knot) = gs.process(pt.0, pt.1) {
+            pts.push(knot);
         }
     }
-    pts.push(gs.finish().as_tuple());
+    pts.push(gs.finish());
     return pts;
 }
 
