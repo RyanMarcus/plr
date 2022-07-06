@@ -38,14 +38,19 @@ impl GreedySpline {
         match self.pt2 {
             None => {
                 self.pt2 = Some(pt);
+                self.slope_ub = self.pt1.line_to(&pt.upper_bound(self.error)).slope();
+                self.slope_lb = self.pt1.line_to(&pt.lower_bound(self.error)).slope();
                 return None;
             }
 
             Some(pt2) => {
+                assert!(x > pt2.x);
+
                 let potential_upper = self.pt1.line_to(&pt.upper_bound(self.error)).slope();
+                let potential_my = self.pt1.line_to(&pt).slope();
                 let potential_lower = self.pt1.line_to(&pt.lower_bound(self.error)).slope();
 
-                if potential_upper > self.slope_ub || potential_lower < self.slope_lb {
+                if potential_my >= self.slope_ub || potential_my <= self.slope_lb {
                     // this point is outside our bound, have to create a new spline point
                     self.pt1 = pt2;
                     self.slope_lb = std::f64::NEG_INFINITY;
@@ -55,6 +60,8 @@ impl GreedySpline {
                 }
 
                 // otherwise, we have a new pt2 and need to update the slope bounds
+                debug_assert!(f64::abs(self.pt1.line_to(&pt).at(pt2.x).y - pt2.y) <= self.error);
+
                 self.pt2 = Some(pt);
                 self.slope_lb = f64::max(self.slope_lb, potential_lower);
                 self.slope_ub = f64::min(self.slope_ub, potential_upper);
@@ -68,7 +75,7 @@ impl GreedySpline {
     pub fn finish(self) -> (f64, f64) {
         match self.pt2 {
             Some(pt) => (pt.x, pt.y),
-            None => (self.pt1.x, self.pt1.y)
+            None => (self.pt1.x, self.pt1.y),
         }
     }
 }
@@ -127,6 +134,13 @@ mod test {
         let data = osm_data();
         let pts = greedy_spline(&data, 64.0);
         verify_gamma_splines(64.0, &data, &pts);
+    }
+
+    #[test]
+    fn test_osm_int_keys() {
+        let data = osm_data();
+        let pts = greedy_spline(&data, 64.0);
+        verify_gamma_splines_cast(64.0, &data, &pts);
     }
 
     #[test]

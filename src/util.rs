@@ -113,6 +113,7 @@ impl Point {
         return Point { x, y };
     }
 
+    #[cfg(test)]
     pub fn from_tuple(pt: (f64, f64)) -> Point {
         return Point::new(pt.0, pt.1);
     }
@@ -140,7 +141,7 @@ impl Point {
     pub fn line_to(&self, other: &Point) -> Line {
         let a = self.slope_to(other);
 
-        debug_assert!(!f64::is_nan(a));
+        debug_assert!(!f64::is_nan(a), "slope from {:?} to {:?} was NaN", self, other);
 
         let b = -a * self.x + self.y;
         return Line { a, b };

@@ -91,12 +91,6 @@ pub fn verify_gamma(gamma: f64, data: &[(f64, f64)], segments: &[Segment]) {
         let line = Line::new(seg.slope, seg.intercept);
         let pred = line.at(x).y;
 
-        if x as u64 == 42285439947654605 {
-            println!("{} to {}", x, pred);
-            println!("with slope: {} and intercept: {}", seg.slope, seg.intercept);
-            println!("segment start: {}", seg.start);
-        }
-
         assert!(
             f64::abs(pred - y) <= gamma,
             "Prediction of {} was not within gamma ({}) of true value {}",
@@ -128,6 +122,22 @@ pub fn verify_gamma_splines(gamma: f64, data: &[(f64, f64)], pts: &[(f64, f64)])
             f64::abs(pred.1 - y) <= gamma,
             "Prediction of {} was not within gamma ({}) of true value {}",
             pred.1,
+            gamma,
+            y
+        );
+    }
+}
+
+pub fn verify_gamma_splines_cast(gamma: f64, data: &[(f64, f64)], pts: &[(f64, f64)]) {
+    println!("{:?}", pts);
+    for &(x, y) in data {
+        let x = (x as u64) as f64;
+        let pred = spline_interpolate(x, pts);
+        let pred = pred.1 as u64;
+        assert!(
+            f64::abs(pred as f64 - y) <= gamma,
+            "Prediction of {} was not within gamma ({}) of true value {}",
+            pred,
             gamma,
             y
         );
