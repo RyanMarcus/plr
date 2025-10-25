@@ -44,7 +44,14 @@ impl GreedySpline {
             }
 
             Some(pt2) => {
-                assert!(x > pt2.x);
+                assert!(
+                    x > pt2.x,
+                    "x values not in order, saw new point ({},{}) with old point ({},{})",
+                    x,
+                    y,
+                    pt2.x,
+                    pt.y
+                );
 
                 let potential_upper = self.pt1.line_to(&pt.upper_bound(self.error)).slope();
                 let potential_my = self.pt1.line_to(&pt).slope();

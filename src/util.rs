@@ -20,7 +20,7 @@
 
 use approx::*;
 use rug::Float;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct Point {
@@ -141,7 +141,12 @@ impl Point {
     pub fn line_to(&self, other: &Point) -> Line {
         let a = self.slope_to(other);
 
-        debug_assert!(!f64::is_nan(a), "slope from {:?} to {:?} was NaN", self, other);
+        debug_assert!(
+            !f64::is_nan(a),
+            "slope from {:?} to {:?} was NaN",
+            self,
+            other
+        );
 
         let b = -a * self.x + self.y;
         return Line { a, b };
